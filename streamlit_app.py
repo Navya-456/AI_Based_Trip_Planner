@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import datetime
+import json
+import os
 
 BASE_URL = "http://localhost:8000"  # Backend endpoint
 
@@ -39,8 +41,22 @@ st.markdown(
 
 
 # ---------------- SESSION STATE ----------------
+USERS_FILE = "users.json"
+
+# Load users from file
+def load_users():
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE, "r") as file:
+            return json.load(file)
+    return {}
+
+# Save users to file
+def save_users(users):
+    with open(USERS_FILE, "w") as file:
+        json.dump(users, file)
+
 if "users" not in st.session_state:
-    st.session_state.users = {}   # Stores users: {username: password}
+    st.session_state.users = load_users()
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -60,7 +76,7 @@ def go_to(page):
 # ---------------- REGISTER PAGE ----------------
 def register_page():
 
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    # st.markdown("<div class='card'>", unsafe_allow_html=True)
 
     st.subheader("📝 Register")
 
@@ -81,6 +97,7 @@ def register_page():
 
         else:
             st.session_state.users[username] = password
+            save_users(st.session_state.users)
             st.success("✅ Registration successful")
             st.info("Please login now")
             go_to("login")
@@ -94,7 +111,7 @@ def register_page():
 # ---------------- LOGIN PAGE ----------------
 def login_page():
 
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    # st.markdown("<div class='card'>", unsafe_allow_html=True)
 
     st.subheader("🔐 Login")
 
@@ -136,7 +153,7 @@ def trip_planner_page():
         st.session_state.current_user = None
         go_to("login")
 
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    # st.markdown("<div class='card'>", unsafe_allow_html=True)
 
     st.subheader("✈️ Plan Your Trip")
 
@@ -170,7 +187,7 @@ def trip_planner_page():
 
                 answer = response.json().get("answer", "No answer returned.")
 
-                st.markdown("<div class='card'>", unsafe_allow_html=True)
+                # st.markdown("<div class='card'>", unsafe_allow_html=True)
 
                 st.markdown(
                     f"""
